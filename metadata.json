@@ -1,0 +1,5 @@
+{
+  "name": "DBMS Fundamentals Visualizer",
+  "description": "An interactive web application to visualize and understand core Database Management System (DBMS) concepts, including the Three-Schema Architecture, the difference between Schema and Instance, and the advantages of DBMS over traditional file systems.",
+  "requestFramePermissions": []
+}
