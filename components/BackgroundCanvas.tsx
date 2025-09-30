@@ -1,15 +1,17 @@
 import React, { useEffect, useRef } from 'react';
 
+// Added properties for pulsing animation
 interface Node {
   x: number;
   y: number;
   vx: number;
   vy: number;
+  radius: number;
+  pulseOffset: number;
 }
 
 const BackgroundCanvas: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  // Fix: Initialize useRef with null to provide an initial value.
   const animationRef = useRef<number | null>(null);
   const nodesRef = useRef<Node[]>([]);
 
@@ -35,11 +37,14 @@ const BackgroundCanvas: React.FC = () => {
           y: Math.random() * canvas.height,
           vx: (Math.random() - 0.5) * 0.5,
           vy: (Math.random() - 0.5) * 0.5,
+          // Initialize properties for pulsing effect
+          radius: 1.5 + Math.random() * 1.5,
+          pulseOffset: Math.random() * Math.PI * 2,
         });
       }
     };
 
-    const animate = () => {
+    const animate = (time: number = 0) => {
       if (!ctx || !canvas) return;
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       
@@ -57,9 +62,9 @@ const BackgroundCanvas: React.FC = () => {
         node.y = Math.max(0, Math.min(canvas.height, node.y));
       });
 
-      // Draw connections
+      // Draw connections with dynamic fading
       const maxDistance = 120;
-      ctx.lineWidth = 1;
+      ctx.lineWidth = 0.5; // Made lines thinner for a more subtle look
 
       for (let i = 0; i < nodesRef.current.length; i++) {
         for (let j = i + 1; j < nodesRef.current.length; j++) {
@@ -70,8 +75,10 @@ const BackgroundCanvas: React.FC = () => {
           );
           
           if (distance < maxDistance) {
-            // Use dark theme styles since the app is dark by default
-            const opacity = (1 - distance / maxDistance) * 0.25; // Adjusted for better visibility
+            const baseOpacity = (1 - distance / maxDistance);
+            // Shimmer effect creates dynamic fading in and out of connections
+            const shimmer = (Math.sin(time / 1500 + nodeA.x / 50) + 1) / 2;
+            const opacity = baseOpacity * shimmer * 0.4;
             ctx.strokeStyle = `rgba(59, 130, 246, ${opacity})`;
             
             ctx.beginPath();
@@ -82,11 +89,14 @@ const BackgroundCanvas: React.FC = () => {
         }
       }
 
-      // Draw nodes
-      ctx.fillStyle = 'rgba(59, 130, 246, 0.3)';
+      // Draw nodes with pulsing effect
+      ctx.fillStyle = 'rgba(59, 130, 246, 0.4)';
       nodesRef.current.forEach(node => {
+        // Calculate current radius based on time for a gentle pulse
+        const pulse = (Math.sin(time / 700 + node.pulseOffset) + 1) / 2;
+        const currentRadius = node.radius + pulse * 1.5;
         ctx.beginPath();
-        ctx.arc(node.x, node.y, 2, 0, Math.PI * 2);
+        ctx.arc(node.x, node.y, currentRadius, 0, Math.PI * 2);
         ctx.fill();
       });
 
@@ -95,6 +105,7 @@ const BackgroundCanvas: React.FC = () => {
 
     resizeCanvas();
     initNodes();
+    // Start animation loop, which will pass a timestamp to `animate`
     animate();
 
     const handleResize = () => {
