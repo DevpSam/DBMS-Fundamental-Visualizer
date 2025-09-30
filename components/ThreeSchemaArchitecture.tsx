@@ -1,4 +1,5 @@
 
+
 import React, { useState } from 'react';
 import { UsersIcon, SchemaIcon, StorageIcon } from './icons.tsx';
 
@@ -81,8 +82,9 @@ const ThreeSchemaArchitecture: React.FC = () => {
               <level.icon className={`w-8 h-8 text-${level.color}-400`} />
               <span className="font-bold text-gray-200">{level.title}</span>
             </button>
+            {/* Fix: Corrected syntax for the separator div to resolve parsing error. */}
             {index < schemaLevels.length - 1 && (
-               <div className="w-1 md:w-12 h-8 md:h-1 bg-gray-600 rounded-full"></div>
+               <div className="w-1 md:w-12 h-8 md:h-1 bg-gray-600 rounded-full" />
             )}
           </React.Fragment>
         ))}
